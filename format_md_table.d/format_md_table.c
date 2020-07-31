@@ -55,6 +55,11 @@ int main(int argc, char* argv[])
     int max_row, max_col;
     char *temp;
 
+    if(argc < 3) {
+	printf("usage:\n\t %s <srcfile> <destfile>\n\t %s test/test.md dest.md\n", argv[0], argv[0]);
+	exit(-1);
+    }
+
     /* Delete all of tab & space */
     char cmd[512]={0};
     sprintf(cmd, "%s%s", "sed -i s/[[:space:]]//g ", argv[1]);
@@ -62,6 +67,8 @@ int main(int argc, char* argv[])
     system(cmd);
 
     fp_s = fopen(argv[1], "r");
+
+    /* Deal with table, fill into t_word map */
     int row = 0;
     int col = 0;
     do {
@@ -96,9 +103,9 @@ int main(int argc, char* argv[])
 	    printf("t_word[%d][%d](%ld) = %s\n", row, col, len, t_word[row][col]);
 	    col++;
 	}
-	row++;
 	if(max_col < col)
 	    max_col = col;
+	row++;
     } while (t_line);
     if(max_row < row)
 	max_row = row;
@@ -106,7 +113,7 @@ int main(int argc, char* argv[])
     printf("max_row=%d\n max_col=%d\n", max_row, max_col);
 
     for(int col=0; col < max_col; col++)
-	max_line[col]+=2;
+	max_line[col]+=2; // add a space both left and right
 
     FILE* fp_d = fopen(argv[2], "w");
 
